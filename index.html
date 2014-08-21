@@ -45,23 +45,36 @@
     <h2>Motivation</h2>
   </hgroup>
   <article data-timings="">
-    <p>Why would you want to know what the fuel economy of your car might be?<br>
-1. First point<br>
-2. Second point<br>
-3. Third point  </p>
+    <ul>
+<li>See how changes in characteristics effect fuel economy<br></li>
+<li>Input your own car&#39;s characteristics to compare it to 
+cars from 1973-74!<br></li>
+</ul>
+
+<p><center>
+<img src="./images/cars_combined.png" alt="Car 1" style="height: 300px;"/>
+</center></p>
+
+<p>Car designed by <a href="http://www.thenounproject.com/AndrewFortnum">Andrew Fortnum</a>, Smart Car designed by <a href="http://www.thenounproject.com/Simon%20Child">Simon Child</a>, Gas designed by <a href="http://www.thenounproject.com/jontesta">Jon Testa</a>, Beaker designed by <a href="http://www.thenounproject.com/edward">Edward Boatman</a>, all from the <a href="http://www.thenounproject.com">Noun Project</a>  </p>
 
   </article>
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="class" id="id" style="background:;">
+<slide class="" id="slide-2" style="background:;">
   <hgroup>
-    <h2>Model anatomy</h2>
+    <h2>App features</h2>
   </hgroup>
   <article data-timings="">
-    <ul>
-<li>some content should go here</li>
-</ul>
+    <ol>
+<li>Interactive sliders and radio buttons to input car characteristics<br></li>
+<li>Automatically updating graph to show your selection amongst the training data<br></li>
+<li>Estimated fuel economy calculated</li>
+</ol>
+
+<p><center>
+<img src="./images/app_screenshot.png" alt="app_screen" style="height: 450px;"/>
+</center></p>
 
   </article>
   <!-- Presenter Notes -->
@@ -69,12 +82,33 @@
 
 <slide class="" id="slide-3" style="background:;">
   <hgroup>
-    <h2>Assumptions made/Variables neglected</h2>
+    <h2>Model anatomy</h2>
   </hgroup>
   <article data-timings="">
     <ul>
-<li>some content should go here</li>
+<li>mtcars data split into training and testing groups
+
+<ul>
+<li>Use testing group to get an out-of-sample error estimate</li>
+</ul></li>
+<li>Linear regression applied to training group</li>
 </ul>
+
+<pre><code class="r">set.seed(38951)
+library(datasets); data(mtcars)
+inTrain &lt;- sample(1:length(mtcars$mpg), size=floor(0.6*length(mtcars$mpg)), replace=FALSE)
+training &lt;- mtcars[inTrain,]; testing &lt;- mtcars[-inTrain,]
+modfit &lt;- lm(mpg ~ wt + factor(cyl) + factor(am), data = training)
+summary(modfit)$coef
+</code></pre>
+
+<pre><code>##              Estimate Std. Error t value  Pr(&gt;|t|)
+## (Intercept)   33.4422      3.567  9.3746 2.066e-07
+## wt            -3.3332      1.109 -3.0052 9.454e-03
+## factor(cyl)6  -3.5224      2.569 -1.3713 1.919e-01
+## factor(cyl)8  -4.5034      2.242 -2.0087 6.426e-02
+## factor(am)1    0.2383      2.001  0.1191 9.069e-01
+</code></pre>
 
   </article>
   <!-- Presenter Notes -->
@@ -82,36 +116,28 @@
 
 <slide class="" id="slide-4" style="background:;">
   <hgroup>
-    <h2>How to use the app</h2>
+    <h2>Assumptions made/Variables neglected</h2>
   </hgroup>
   <article data-timings="">
     <ul>
-<li>some content here</li>
+<li>Used only cyl (# cylinders), am (transmission type), and wt (weight) in the model</li>
+<li>Did not include disp, hp, drat, qsec, vs, gear, carb as variables because their inclusion should not significantly change model</li>
 </ul>
 
-  </article>
-  <!-- Presenter Notes -->
-</slide>
+<pre><code class="r">an2 &lt;- anova(modfit, lm(mpg~wt+factor(cyl)+factor(am)+qsec, data = training))
+an3 &lt;- anova(modfit, lm(mpg~wt+factor(cyl)+factor(am)+hp, data = training))
+an4 &lt;- anova(modfit, lm(mpg~wt+factor(cyl)+factor(am)+gear, data = training))
+an5 &lt;- anova(modfit, lm(mpg~wt+factor(cyl)+factor(am)+disp, data = training))
+an6 &lt;- anova(modfit, lm(mpg~wt+factor(cyl)+factor(am)+carb, data = training))
+an7 &lt;- anova(modfit, lm(mpg~wt+factor(cyl)+factor(am)+drat, data = training))
+data.frame(&#39;qsec&#39;=round(an2$Pr[2],3), &#39;hp&#39;=round(an3$Pr[2],3)
+           , &#39;gear&#39;=round(an4$Pr[2],3), &#39;disp&#39;=round(an5$Pr[2],3)
+           , &#39;carb&#39;=round(an6$Pr[2],3), &#39;drat&#39;=round(an7$Pr[2],3))
+</code></pre>
 
-<slide class="" id="slide-5" style="background:;">
-  <hgroup>
-    <h2>Here are the assignment requirements</h2>
-  </hgroup>
-  <article data-timings="">
-    <ol>
-<li>5 slides to pitch our idea done in Slidify or Rstudio Presenter</li>
-<li>Your presentation pushed to github or Rpubs</li>
-<li>A link to your github or Rpubs presentation pasted into the text box below</li>
-</ol>
-
-<p>Your presentation must satisfy the following</p>
-
-<ol>
-<li>It must be done in Slidify or Rstudio Presenter</li>
-<li>It must be 5 pages</li>
-<li>It must be hosted on github or Rpubs</li>
-<li>It must contained some embedded R code that gets run when slidifying the document</li>
-</ol>
+<pre><code>##    qsec  hp  gear disp  carb  drat
+## 1 0.293 0.2 0.859 0.54 0.487 0.106
+</code></pre>
 
   </article>
   <!-- Presenter Notes -->
@@ -129,26 +155,20 @@
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='Model anatomy'>
+        data-slide=2 title='App features'>
          2
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=3 title='Assumptions made/Variables neglected'>
+        data-slide=3 title='Model anatomy'>
          3
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=4 title='How to use the app'>
+        data-slide=4 title='Assumptions made/Variables neglected'>
          4
-      </a>
-    </li>
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=5 title='Here are the assignment requirements'>
-         5
       </a>
     </li>
   </ul>
